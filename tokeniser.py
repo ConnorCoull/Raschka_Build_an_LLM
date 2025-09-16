@@ -1,47 +1,41 @@
 import re
-from tokeniser_utils import SimpleTokeniserV1, SimpleTokeniserV2
+import torch
+import tiktoken
+from utils.dataloader_utils import GPTDatasetV1
+from torch.utils.data import DataLoader
+
+def create_dataloader_v1(text, batch_size=4, max_length=256, stride=128, shuffle=True, drop_last=True, num_workers=0):
+    tokeniser = tiktoken.get_encoding("gpt2")
+    dataset = GPTDatasetV1(text, tokeniser, max_length, stride)
+    dataloader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        drop_last=drop_last,
+        num_workers=num_workers
+    )
+
+    return dataloader
+
+
+tokeniser = tiktoken.get_encoding("gpt2")
 
 with open("the-verdict.txt", "r", encoding="utf-8") as f:
     raw_text = f.read()
 
-print(f"The total number of characters is {len(raw_text)}.\n")
-print(f"The first 100 characters are:\n{raw_text[:100]}\n")
+enc_text = tokeniser.encode(raw_text)
+print(len(enc_text))
 
-preprocessed_text = re.split(r'([,.:;?_!"()\']|--|\s)', raw_text)
-preprocessed_text = [item.strip() for item in preprocessed_text if item.strip()]
-print(f"Length of the pre-processed text: {len(preprocessed_text)}")
+enc_sample = enc_text[50:]
 
-all_tokens = set(preprocessed_text)
-vocab_size = len(all_tokens)
-print(f"The vocabulary size is {vocab_size}.\n")
+context_size = 4
 
-vocab = {token: integer for integer, token in enumerate(sorted(all_tokens))}
+for i in range(1, context_size+1):
+    context = enc_sample[:i]
+    desired = enc_sample[i]
+    print(f"{tokeniser.decode(context)} ---> {tokeniser.decode([desired])}")
 
-# Print first 50
-# for i, item in enumerate(vocab.items()):
-#     print(item)
-#     if i >= 49:
-#         break
+# Tokeniser works on numbers too
+print(tokeniser.encode("12 angry men. 100 ways to die. 1 fun film!"))
 
-tokeniser = SimpleTokeniserV1(vocab)
-text = """It's the last he painted, you know, Mrs. Gisburn said with pardonable pride."""
-ids = tokeniser.encode(text)
-print(ids)
 
-print(tokeniser.decode(ids))
-
-all_tokens = sorted(list(set(preprocessed_text)))
-all_tokens.extend(["<UNK>", "<ENDOFTEXT>"])
-vocab = {token: integer for integer, token in enumerate(all_tokens)}
-
-# for i, item in enumerate(list(vocab.items())[-5:]):
-#     print(item)
-
-text1 = "Hello, do you like Python?"
-text2 = "In the sunlit terraces of the palace."
-text = " <ENDOFTEXT> ".join([text1, text2])
-print(text)
-
-tokeniser = SimpleTokeniserV2(vocab)
-print(tokeniser.encode(text))
-print(tokeniser.decode(tokeniser.encode(text)))
