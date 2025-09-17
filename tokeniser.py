@@ -17,25 +17,11 @@ def create_dataloader_v1(text, batch_size=4, max_length=256, stride=128, shuffle
 
     return dataloader
 
-
-tokeniser = tiktoken.get_encoding("gpt2")
-
 with open("the-verdict.txt", "r", encoding="utf-8") as f:
     raw_text = f.read()
 
-enc_text = tokeniser.encode(raw_text)
-print(len(enc_text))
-
-enc_sample = enc_text[50:]
-
-context_size = 4
-
-for i in range(1, context_size+1):
-    context = enc_sample[:i]
-    desired = enc_sample[i]
-    print(f"{tokeniser.decode(context)} ---> {tokeniser.decode([desired])}")
-
-# Tokeniser works on numbers too
-print(tokeniser.encode("12 angry men. 100 ways to die. 1 fun film!"))
-
+downloader = create_dataloader_v1(raw_text, batch_size=1, max_length=8, stride=4, shuffle=False)
+data_iter = iter(downloader)
+first_batch = next(data_iter)
+print(first_batch)
 

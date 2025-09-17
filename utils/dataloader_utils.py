@@ -11,7 +11,7 @@ class GPTDatasetV1(Dataset, DataLoader):
         # Sliding window chunks the text into overlapping sequences of max_length
         for i in range(0, len(token_ids) - max_length, stride):
             input_chunk = token_ids[i:i + max_length]
-            target_chunk = token_ids[i + 1: i + max_length + 1]
+            target_chunk = token_ids[i + stride: i + max_length + stride]
             self.input_ids.append(torch.tensor(input_chunk))
             self.target_ids.append(torch.tensor(target_chunk))
 
