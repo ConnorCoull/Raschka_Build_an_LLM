@@ -1,4 +1,5 @@
 import torch
+import tiktoken
 from torch.utils.data import Dataset, DataLoader
 
 class GPTDatasetV1(Dataset, DataLoader):
@@ -22,3 +23,17 @@ class GPTDatasetV1(Dataset, DataLoader):
     # Returns a row (input, target pair) from the dataset
     def __getitem__(self, index):
         return self.input_ids[index], self.target_ids[index]
+    
+
+def create_dataloader_v1(text, batch_size=4, max_length=256, stride=128, shuffle=True, drop_last=True, num_workers=0):
+    tokeniser = tiktoken.get_encoding("gpt2")
+    dataset = GPTDatasetV1(text, tokeniser, max_length, stride)
+    dataloader = DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        drop_last=drop_last,
+        num_workers=num_workers
+    )
+
+    return dataloader
