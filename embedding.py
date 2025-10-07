@@ -30,4 +30,3 @@ print(pos_embeddings.shape)
 
 input_embeddings = token_embeddings + pos_embeddings
 print(input_embeddings.shape)
-
