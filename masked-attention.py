@@ -31,8 +31,9 @@ masked = attn_scores.masked_fill(mask.bool(), -torch.inf)
 attn_weights = torch.softmax(masked/keys.shape[-1]**0.5, dim=1)
 #print(attn_weights)
 
-### DROPOUT ###
 torch.manual_seed(123)
 dropout = torch.nn.Dropout(0.5)
-example = torch.ones(6,6)
-print(dropout(example))
+#print(dropout(attn_weights))
+
+batch = torch.stack((inputs, inputs), dim=0)
+print(batch.shape)
