@@ -12,7 +12,7 @@ inputs = torch.tensor(
 
 torch.manual_seed(123)
 batch = torch.stack((inputs, inputs), dim=0)
-d_in, d_out = 3, 2
+d_in, d_out = 3, 1
 context_length = batch.shape[1]
 
 mha = MultiHeadAttentionWrapper(d_in, d_out, context_length, 0.0, num_heads=2)
