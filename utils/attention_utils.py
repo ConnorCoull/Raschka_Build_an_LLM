@@ -65,9 +65,9 @@ class MultiHeadAttentionWrapper(nn.Module):
     def forward(self, x):
         return torch.cat([head(x) for head in self.heads], dim=-1)
 
-class MultiHeadAttention(nn.Module):
+class MultiHeadAttention(nn.Module): # every nn is a subclass of nn.Module
     def __init__(self, d_in, d_out, context_length, dropout, num_heads, qkv_bias=False):
-        super().__init__()
+        super().__init__() # specifically an init call to the parent class, to register layers etc
         assert(d_out % num_heads == 0), f"The output dimension (d_out): {d_out} must be divisible by the number of heads (num_heads): {num_heads}"
 
         self.d_out = d_out
@@ -82,6 +82,7 @@ class MultiHeadAttention(nn.Module):
     
     def forward(self, x):
         b, num_tokens, d_in = x.shape
+
         # Tensor shape - (b, num_tokens, d_out)
         queries = self.W_query(x)
         keys = self.W_key(x)
@@ -89,7 +90,7 @@ class MultiHeadAttention(nn.Module):
 
         # We implicitly split the matrix by adding a num_heads dimension. Then we unroll 
         # the last dim: (b, num_tokens, d_out) -> (b, num_tokens, num_heads, head_dim)
-        queries = queries.view(b, num_tokens, self.num_heads, self.head_dim)
+        queries = queries.view(b, num_tokens, self.num_heads, self.head_dim) # Can visualise what this looks like in my head
         keys = keys.view(b, num_tokens, self.num_heads, self.head_dim)
         values = values.view(b, num_tokens, self.num_heads, self.head_dim)
 
@@ -100,7 +101,7 @@ class MultiHeadAttention(nn.Module):
         values = values.transpose(1, 2)
 
         # Computes dot product for each head
-        attn_scores = queries @ keys.transpose(2, 3) # Computes dot prduct for each head
+        attn_scores = queries @ keys.transpose(2, 3) # Computes dot product for each head, whats being transposed by 2,3 specifically?
         mask_bool = self.mask.bool()[:num_tokens, :num_tokens]
 
         attn_scores.masked_fill_(mask_bool, -torch.inf) # Uses the masks to fill attention scores
