@@ -9,7 +9,7 @@ class DummyGPTModel(nn.Module):
         self.drop_emb = nn.Dropout(cfg["drop_rate"])
         # Placeholder Transformer block
         self.trf_blocks = nn.Sequential(
-            *[DummyTransformerBlock(cfg) for _ in range(cfg["n_layer"])]
+            *[DummyTransformerBlock(cfg) for _ in range(cfg["n_layers"])]
         )
         # Placeholder LayerNorm
         self.final_norm = DummyLayerNorm(cfg["emb_dim"])
